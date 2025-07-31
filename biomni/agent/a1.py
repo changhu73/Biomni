@@ -2,10 +2,11 @@ import glob
 import inspect
 import os
 import re
-from typing import Literal, TypedDict
+from typing import Literal, TypedDict, Union
 
 import pandas as pd
 from dotenv import load_dotenv
+from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langgraph.checkpoint.memory import MemorySaver
@@ -41,41 +42,27 @@ class AgentState(TypedDict):
 class A1:
     def __init__(
         self,
-        path="./data",
-        llm="claude-sonnet-4-20250514",
-        use_tool_retriever=True,
-        timeout_seconds=600,
+        path: str = "./data",
+        llm: Union[str, BaseChatModel] = "qwen/qwen-2.5-72b-instruct:free",
+        use_tool_retriever: bool = True,
+        timeout_seconds: int = 600,
         base_url: str | None = None,
         api_key: str = "EMPTY",
     ):
-        """Initialize the biomni agent.
-
-        Args:
-            path: Path to the data
-            llm: LLM to use for the agent
-            use_tool_retriever: If True, use a tool retriever
-            timeout_seconds: Timeout for code execution in seconds
-            base_url: Base URL for custom model serving (e.g., "http://localhost:8000/v1")
-            api_key: API key for the custom LLM
-
-        """
         self.path = path
 
         if not os.path.exists(path):
             os.makedirs(path)
             print(f"Created directory: {path}")
 
-        # --- Begin custom folder/file checks ---
         benchmark_dir = os.path.join(path, "biomni_data", "benchmark")
         data_lake_dir = os.path.join(path, "biomni_data", "data_lake")
 
-        # Create the biomni_data directory structure
         os.makedirs(benchmark_dir, exist_ok=True)
         os.makedirs(data_lake_dir, exist_ok=True)
 
         expected_data_lake_files = list(data_lake_dict.keys())
 
-        # Check and download missing data lake files
         print("Checking and downloading missing data lake files...")
         check_and_download_s3_files(
             s3_bucket_url="https://biomni-release.s3.amazonaws.com",
@@ -84,7 +71,6 @@ class A1:
             folder="data_lake",
         )
 
-        # Check if benchmark directory structure is complete
         benchmark_ok = False
         if os.path.isdir(benchmark_dir):
             patient_gene_detection_dir = os.path.join(benchmark_dir, "hle")
@@ -96,14 +82,22 @@ class A1:
             check_and_download_s3_files(
                 s3_bucket_url="https://biomni-release.s3.amazonaws.com",
                 local_data_lake_path=benchmark_dir,
-                expected_files=[],  # Empty list - will download entire folder
+                expected_files=[],
                 folder="benchmark",
             )
 
         self.path = os.path.join(path, "biomni_data")
         module2api = read_module2api()
 
-        self.llm = get_llm(llm, stop_sequences=["</execute>", "</solution>"], base_url=base_url, api_key=api_key)
+        if isinstance(llm, BaseChatModel):
+            print("Using pre-configured LLM object.")
+            self.llm = llm
+        elif isinstance(llm, str):
+            print(f"Initializing LLM from model name string: '{llm}'.")
+            self.llm = get_llm(llm, stop_sequences=["</execute>", "</solution>"], base_url=base_url, api_key=api_key)
+        else:
+            raise TypeError(f"Unsupported type for 'llm': {type(llm)}. Must be a string or a BaseChatModel instance.")
+
         self.module2api = module2api
         self.use_tool_retriever = use_tool_retriever
 
@@ -111,8 +105,7 @@ class A1:
             self.tool_registry = ToolRegistry(module2api)
             self.retriever = ToolRetriever()
 
-        # Add timeout parameter
-        self.timeout_seconds = timeout_seconds  # 10 minutes default timeout
+        self.timeout_seconds = timeout_seconds
         self.configure()
 
     def add_tool(self, api):
