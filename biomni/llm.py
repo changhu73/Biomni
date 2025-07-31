@@ -42,7 +42,7 @@ def get_llm(
         elif model[:7] == "gemini-":
             source = "Gemini"
         elif base_url is not None:
-            source = "Custom"
+            source = "OpenRouter"
         elif "/" in model or any(
             name in model.lower() for name in ["llama", "mistral", "qwen", "gemma", "phi", "dolphin", "orca", "vicuna"]
         ):
@@ -50,7 +50,7 @@ def get_llm(
         elif model.startswith(
             ("anthropic.claude-", "amazon.titan-", "meta.llama-", "mistral.", "cohere.", "ai21.", "us.")
         ):
-            source = "Bedrock"
+            source = "OpenRouter"
         else:
             raise ValueError("Unable to determine model source. Please specify 'source' parameter.")
 
