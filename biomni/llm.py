@@ -10,7 +10,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_ollama import ChatOllama
 from langchain_openai import AzureChatOpenAI, ChatOpenAI
 
-SourceType = Literal["OpenAI", "AzureOpenAI", "Anthropic", "Ollama", "Gemini", "Bedrock", "Custom"]
+SourceType = Literal["OpenAI", "AzureOpenAI", "Anthropic", "Ollama", "Gemini", "Bedrock", "Custom", "OpenRouter"]
 
 
 def get_llm(
@@ -46,7 +46,7 @@ def get_llm(
         elif "/" in model or any(
             name in model.lower() for name in ["llama", "mistral", "qwen", "gemma", "phi", "dolphin", "orca", "vicuna"]
         ):
-            source = "Ollama"
+            source = "OpenRouter"
         elif model.startswith(
             ("anthropic.claude-", "amazon.titan-", "meta.llama-", "mistral.", "cohere.", "ai21.", "us.")
         ):
@@ -99,6 +99,30 @@ def get_llm(
     #         stop_sequences=stop_sequences,
     #         region_name=os.getenv("AWS_REGION", "us-east-1"),
     #     )
+    elif source == "OpenRouter":
+        openrouter_api_key = api_key if api_key != "EMPTY" else os.getenv("OPENROUTER_API_KEY")
+        if not openrouter_api_key:
+            raise ValueError(
+                "OpenRouter API key not found. Please provide it via the 'api_key' parameter "
+                "or set the OPENROUTER_API_KEY environment variable."
+            )
+
+        site_url = os.getenv("YOUR_SITE_URL", "http://localhost:8000")
+        site_name = os.getenv("YOUR_SITE_NAME", "Biomni")   
+
+        return ChatOpenAI(
+            model=model,
+            temperature=temperature,
+            stop_sequences=stop_sequences,
+            api_key=openrouter_api_key,
+            base_url="https://openrouter.ai/api/v1",
+            model_kwargs={
+                "extra_headers": {
+                    "HTTP-Referer": site_url,
+                    "X-Title": site_name,
+                }
+            },
+        )
     elif source == "Custom":
         # Custom LLM serving such as SGLang. Must expose an openai compatible API.
         assert base_url is not None, "base_url must be provided for customly served LLMs"
