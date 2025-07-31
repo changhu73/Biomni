@@ -1,0 +1,31 @@
+{
+  "library_info": {
+    "library_name": "T_cell_exhaustion_CRISPR_library_v1",
+    "total_guides": 143,
+    "genes": 32,
+    "guides_per_gene": 4,
+    "controls": 15
+  },
+  "gene_specific_guides": {},
+  "control_guides": {
+    "non_targeting_controls": [
+      "GTACTGAGTCGGAATTGCGA",
+      "GACGCTTACCGATTCAGAAT",
+      "CGTACGCAAGTTCGAGAAGC",
+      "GCTAGTCGAGCGATCTAATC",
+      "TGACGTCGAGTCGATCGTAT",
+      "GATCGTAGCTGATGCTAGTC",
+      "CGTAGCTAGCTGATCGATGC",
+      "GCTAGCTGATCGTAGCTAGT",
+      "GTAGCTGATCGTAGCTAGCT",
+      "GATCGATCGTAGCTAGTCGA"
+    ],
+    "safe_targeting_controls": [
+      "GGGCAGTGAGAGCGAGAATC",
+      "GAGTCCGAGCAGAAGAAGAA",
+      "GACCCCAAAGTGCTGGGATT",
+      "GCTTCGCGCGCTACCTCAGG",
+      "GGGCAGTGAGAGCGAGAATC"
+    ]
+  }
+}

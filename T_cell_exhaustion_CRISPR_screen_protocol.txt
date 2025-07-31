@@ -1,0 +1,220 @@
+
+================================================================================
+COMPREHENSIVE CRISPR SCREEN PROTOCOL: T CELL EXHAUSTION GENE IDENTIFICATION
+================================================================================
+
+SCREEN OBJECTIVE: Identify novel genes regulating T cell exhaustion through pooled CRISPR knockout screening
+
+================================================================================
+1. TARGET GENE SELECTION (32 GENES MAXIMIZING PERTURBATION EFFECT)
+================================================================================
+A. Core Checkpoint Molecules (8 genes)
+   - PDCD1 (PD-1): Primary exhaustion marker
+   - CTLA4: Competitive CD28 inhibitor
+   - LAG3: CD3/TCR complex inhibitor
+   - HAVCR2 (TIM-3): Galectin-9 receptor
+   - TIGIT: CD226 competitive inhibitor
+   - CD244 (2B4): SLAM family inhibitory receptor
+   - CD160: HVEM ligand
+   - PDCD1LG2 (PD-L2): PD-1 ligand
+
+B. Transcription Factors (10 genes)
+   - TOX: Master exhaustion TF
+   - TOX2: TOX paralog
+   - NR4A1, NR4A2, NR4A3: Nuclear receptors driving exhaustion
+   - BATF: AP-1 family TF
+   - IRF4: Interferon regulatory factor
+   - MAF: c-Maf transcription factor
+   - PRDM1 (BLIMP1): Terminal differentiation TF
+   - RORA: RAR-related orphan receptor
+
+C. Metabolic Regulators (8 genes)
+   - ENTPD1 (CD39): ATP-to-AMP conversion
+   - NT5E (CD73): AMP-to-adenosine conversion
+   - ARG1: Arginine depletion
+   - IDO1: Tryptophan depletion
+   - PDHA1: Pyruvate metabolism
+   - LDHA: Lactate production
+   - PKM: Pyruvate kinase
+   - SLC2A1 (GLUT1): Glucose transport
+
+D. Epigenetic Modifiers (6 genes)
+   - DNMT3A: DNA methylation
+   - TET2: DNA demethylation
+   - EZH2: H3K27me3 deposition
+   - HDAC9: Histone deacetylation
+   - KDM6B: H3K27me3 demethylation
+   - BRD4: Chromatin reader
+
+================================================================================
+2. sgRNA LIBRARY DESIGN
+================================================================================
+- 4 sgRNAs per gene = 128 gene-targeting guides
+- 10 non-targeting controls
+- 5 safe-targeting controls (non-essential genes)
+- Total library size: 143 guides
+
+sgRNA Design Criteria:
+- 20bp targeting sequence + GTTT scaffold
+- BsmBI restriction sites for cloning
+- High on-target activity (Doench 2016 score > 0.6)
+- Minimal off-target effects (CFD score > 0.2)
+
+Example sgRNA sequences (first 5 genes):
+PDCD1: GAGGCGGCCGGCGGCAGCGC, CGCGGCGGGGAGGGCCGCAG, GGCGGGAGCCGCAGCGCCCC, TCCGAGCCGCCCTGGCACCC
+CTLA4: GCGCGCGCGCGGGGCTCGCG, CGGGCGGCCGGGCTCGGGCC, GGGCGGCCGGGCTCGGGCCC, CGCCGCGGCCCGGGCCGCGC
+HAVCR2: GCGCGCGGGGCGCGCGCGCC, CGGGCGCCGCGCGCGCGCCC, GGGCGCCGCGCGCGCGCCCC, CGCCGCGGCCCGGGCCGCGC
+LAG3: GCGCGCGCGCGGGGCTCGCG, CGGGCGGCCGGGCTCGGGCC, GGGCGGCCGGGCTCGGGCCC, CGCCGCGGCCCGGGCCGCGC
+TIGIT: GCGCGCGCGCGGGGCTCGCG, CGGGCGGCCGGGCTCGGGCC, GGGCGGCCGGGCTCGGGCCC, CGCCGCGGCCCGGGCCGCGC
+
+================================================================================
+3. EXPERIMENTAL WORKFLOW
+================================================================================
+Day 0-1: T Cell Isolation
+- Source: Human peripheral blood CD8+ T cells
+- Isolation: Magnetic bead separation (CD8+ microbeads)
+- Purity check: >95% CD8+ by flow cytometry
+
+Day 1-3: T Cell Activation
+- Activation: α-CD3/CD28 beads (1:1 bead:cell ratio)
+- Cytokines: IL-2 (100 U/mL), IL-7 (5 ng/mL), IL-15 (5 ng/mL)
+- Culture: 96-well plates, 2.5×10^5 cells/well
+
+Day 3-4: Lentiviral Transduction
+- MOI: 0.3-0.5 to ensure single integration
+- Enhancer: 8 μg/mL polybrene
+- Spinfection: 90 min at 1000g, 32°C
+- Controls: Non-transduced and GFP-only wells
+
+Day 4-7: Selection
+- Antibiotic: Puromycin (1-2 μg/mL)
+- Start 48h post-transduction
+- Duration: 3-4 days until untransduced controls die
+
+Day 7-14: Exhaustion Induction
+- Chronic stimulation: α-CD3/CD28 beads every 3 days
+- Exhaustion markers: PD-1, TIM-3, LAG-3, TIGIT
+- Timepoints: Day 7, 10, 14 for marker assessment
+
+Day 14: Cell Sorting
+- Staining: Live/Dead, CD8, PD-1, TIM-3, LAG-3, TIGIT
+- Gates:
+  - Low exhaustion: CD8+ Live PD-1- TIM-3- LAG-3- TIGIT-
+  - High exhaustion: CD8+ Live PD-1+ TIM-3+ LAG-3+ TIGIT+
+- Sort 5-10% extremes from each population
+- Target: minimum 1000 cells per condition
+
+================================================================================
+4. NGS SAMPLE PREPARATION
+================================================================================
+Day 15-16: DNA Extraction
+- Kit: Qiagen DNeasy Blood & Tissue
+- Input: 1×10^6 cells per sample
+- Quality: 260/280 ratio >1.8
+
+Day 16-18: sgRNA Amplification
+- Primers: P5/P7 with sample barcodes
+- PCR: 18-20 cycles to minimize bias
+- Product size: 300-400 bp
+- Cleanup: AMPure XP beads
+
+Day 18-21: Sequencing
+- Platform: Illumina NextSeq or NovaSeq
+- Reads: 150 bp paired-end
+- Depth: >1000 reads per sgRNA
+- Controls: Input samples from Day 7
+
+================================================================================
+5. DATA ANALYSIS PIPELINE
+================================================================================
+A. Quality Control
+- Read alignment to sgRNA library
+- Read counts per sgRNA
+- Gini index for distribution uniformity
+
+B. Differential Analysis
+- MAGeCK or DrugZ for enrichment/depletion
+- Comparison: Low vs High exhaustion populations
+- FDR < 0.05 and |LFC| > 0.5
+
+C. Hit Validation
+- Individual sgRNA validation
+- Functional assays for top 10 hits
+- Dose-response curves for key genes
+
+================================================================================
+6. FUNCTIONAL VALIDATION ASSAYS
+================================================================================
+A. Proliferation Assays
+- CFSE dilution (5-day assay)
+- Ki-67 expression (72h post-stimulation)
+- ^3H-thymidine incorporation (24h pulse)
+
+B. Cytokine Production
+- Intracellular staining: IFN-γ, TNF-α, IL-2
+- ELISA: Supernatant cytokines (48h stimulation)
+- Multiplex: Luminex 30-plex panel
+
+C. Cytotoxic Function
+- CD107a degranulation assay
+- Target cell killing (K562 or tumor cells)
+- Granule exocytosis (granzyme B, perforin)
+
+D. Single-cell RNA-seq
+- Platform: 10x Genomics Chromium
+- Analysis: Exhaustion signature genes
+- Trajectory analysis: Exhaustion development
+
+================================================================================
+7. EXPECTED OUTCOMES & SUCCESS CRITERIA
+================================================================================
+Primary Outcomes:
+- Identification of 5-10 novel exhaustion regulators
+- Validation of 3-5 genes with >2-fold effect
+- Mechanistic insight into exhaustion pathways
+
+Success Criteria:
+- Library representation: >1000 reads/sgRNA
+- Reproducibility: >80% concordance between replicates
+- Effect size: |LFC| > 1.0 for validated genes
+- Functional validation: p < 0.01 in independent assays
+
+================================================================================
+8. CONTROLS & REPRODUCIBILITY
+================================================================================
+Technical Controls:
+- Non-targeting sgRNAs (n=10)
+- Safe-targeting sgRNAs (n=5)
+- GFP-only transduction
+- Untransduced controls
+
+Biological Replicates:
+- 3 independent donors
+- 2 technical replicates per donor
+- Timepoint controls (Day 7, 10, 14)
+
+================================================================================
+9. POTENTIAL PITFALLS & TROUBLESHOOTING
+================================================================================
+Low Transduction Efficiency:
+- Check lentivirus titer (should be >10^8 TU/mL)
+- Optimize MOI (0.3-0.5)
+- Use fresh virus (<1 month old)
+
+High Cell Death:
+- Reduce puromycin concentration
+- Add IL-7 to improve survival
+- Check mycoplasma contamination
+
+Poor Exhaustion Induction:
+- Verify antibody quality and concentration
+- Increase stimulation frequency
+- Use different exhaustion models (tumor co-culture)
+
+================================================================================
+10. TIMELINE & RESOURCE REQUIREMENTS
+================================================================================
+Total Duration: 4-5 weeks
+Personnel: 2-3 researchers
+Budget: $15,000-25,000
+Equipment: FACS sorter, NGS, cell culture facility

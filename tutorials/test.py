@@ -2,11 +2,13 @@
 
 
 import os
+import sys
+from contextlib import redirect_stdout
 from biomni.agent import A1
 from biomni.llm import get_llm
 
 def run_test():
-    api_key = ""
+    api_key = "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"
 
     if not api_key:
         raise ValueError("OpenRouter API key not found. Please set the OPENROUTER_API_KEY environment variable.")
@@ -14,7 +16,7 @@ def run_test():
     print("Step 1: Creating the LLM instance for OpenRouter...")
     try:
         llm_instance = get_llm(
-            model="qwen/qwen-2.5-72b-instruct:free",
+            model="moonshotai/kimi-k2:free",
             source="OpenRouter",
             api_key=api_key
         )
@@ -51,4 +53,15 @@ def run_test():
             print(f"An error occurred during task execution: {e}")
 
 if __name__ == "__main__":
-    run_test()
+    log_file_path = "execution_log.txt"
+    print(f"Starting execution. All output will be saved to '{log_file_path}'")
+
+    with open(log_file_path, 'w', encoding='utf-8') as log_file:
+        with redirect_stdout(log_file):
+            try:
+                run_test()
+            except Exception as e:
+                print(f"\nA critical error occurred: {e}", file=sys.stderr)
+                print(f"\nA critical error occurred: {e}")
+
+    print("Execution finished. Log has been saved successfully.")
