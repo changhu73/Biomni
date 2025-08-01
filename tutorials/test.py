@@ -8,7 +8,8 @@ from biomni.agent import A1
 from biomni.llm import get_llm
 
 def run_test():
-    api_key = "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"
+    api_key = "" 
+# api key here
 
     if not api_key:
         raise ValueError("OpenRouter API key not found. Please set the OPENROUTER_API_KEY environment variable.")
